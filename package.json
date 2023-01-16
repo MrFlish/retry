@@ -1,5 +1,5 @@
 {
-  "name": "retry",
+  "name": "@mrflish/retry",
   "version": "1.0.0",
   "description": "promise based retry pattern with typescript guards",
   "main": "./dist/index.js",
