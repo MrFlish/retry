@@ -2,7 +2,7 @@
   "name": "retry",
   "version": "1.0.0",
   "description": "promise based retry pattern with typescript guards",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc"
