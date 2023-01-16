@@ -294,98 +294,98 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { EventEmitter } from "events";
 &nbsp;
 interface RetryOptions {
-    interval: number,
-    exponential: boolean,
-    factor: number
+	interval: number,
+	exponential: boolean,
+	factor: number
 }
 &nbsp;
 const DEFAULT_OPTIONS: RetryOptions = {
-    interval: 0,
-    exponential: false,
-    factor: 2
-}
+	interval: 0,
+	exponential: false,
+	factor: 2
+};
 &nbsp;
 export interface Retry&lt;T extends (...args: any) =&gt; Promise&lt;any&gt;&gt;{
-    target: T;
-    parameters: Parameters&lt;T&gt;,
-    options: RetryOptions;
-    event: EventEmitter;
-    
-    constructor(target: T, parameters: Parameters&lt;T&gt;, options: Partial&lt;RetryOptions&gt;): void;
-    try(tries: number): Promise&lt;T&gt;;
-    updateInterval(): number;
-    on(event: "failure", cb: (error: any, countdown: number, currentInterval: number) =&gt; void): this
-    on(event: "retry", cb: (countdown: number, currentInterval: number) =&gt; void): this
-    once(event: "failure", cb: (error: any, countdown: number, currentInterval: number) =&gt; void): this
-    once(event: "retry", cb: (countdown: number, currentInterval: number) =&gt; void): this
+	target: T;
+	parameters: Parameters&lt;T&gt;,
+	options: RetryOptions;
+	event: EventEmitter;
+	
+	new(target: T, parameters: Parameters&lt;T&gt;, options: Partial&lt;RetryOptions&gt;): void;
+	try(tries: number): Promise&lt;T&gt;;
+	updateInterval(): number;
+	on(event: "failure", cb: (error: any, countdown: number, currentInterval: number) =&gt; void): this
+	on(event: "retry", cb: (countdown: number, currentInterval: number) =&gt; void): this
+	once(event: "failure", cb: (error: any, countdown: number, currentInterval: number) =&gt; void): this
+	once(event: "retry", cb: (countdown: number, currentInterval: number) =&gt; void): this
 }
 &nbsp;
 /**Allows you to retry an async function while it fails until the max number of tries have been reached. */
 export class Retry&lt;T extends (...args: any) =&gt; Promise&lt;any&gt;&gt; {
-    private _target: T;
-    private _parameters: Parameters&lt;T&gt;;
-    private _options: RetryOptions;
-    private _event: EventEmitter;
+	private _target: T;
+	private _parameters: Parameters&lt;T&gt;;
+	private _options: RetryOptions;
+	private _event: EventEmitter;
 &nbsp;
-    /**
-     * Allows you to retry an async function while it fails until the max number of tries have been reached
-     * @param target async function to execute until it succeeds.
-     * @param parameters parameters of the async function to execute.
-    */
-    constructor(target: T, parameters: Parameters&lt;T&gt;, options: Partial&lt;RetryOptions&gt; = {}){
-        this._target = target;
-        this._parameters = parameters;
-        this._options = Object.assign(DEFAULT_OPTIONS, options);
-        this._event = new EventEmitter();
-    }
+	/**
+	 * Allows you to retry an async function while it fails until the max number of tries have been reached
+	 * @param target async function to execute until it succeeds.
+	 * @param parameters parameters of the async function to execute.
+	*/
+	constructor(target: T, parameters: Parameters&lt;T&gt;, options: Partial&lt;RetryOptions&gt; = {}){
+		this._target = target;
+		this._parameters = parameters;
+		this._options = Object.assign(DEFAULT_OPTIONS, options);
+		this._event = new EventEmitter();
+	}
 &nbsp;
-    /**
-     * Tries to execute the async function. If it fails, tries again until it succeeds, or until the max number of tries have been reached.
-     * @param tries Max number of tries before rejecting.
-     * @returns 
-    */
-    public async try(tries: number): Promise&lt;T&gt;{
-        const retry = async(i: number, target: T, ...parameters: Parameters&lt;T&gt;): Promise&lt;T&gt; =&gt; {
-            try {
-                const data = await target(...[...parameters]);
-                return data;
-            }
-            catch (e) {
-                this._event.emit("failure", e, i, this._options.interval);
-                if (i &lt;= 1) return Promise.reject(e);
-                this._event.emit("retry", i, this._options.interval);
-                if(this._options.interval &gt; 0){
-                    await new Promise(resolve =&gt; setTimeout(resolve, this._options.interval));
-                    this._updateInterval();
-                    return retry(i - 1, target, ...parameters);
-                }
-                else return retry(i - 1, target, ...parameters);
-            }
-        };
+	/**
+	 * Tries to execute the async function. If it fails, tries again until it succeeds, or until the max number of tries have been reached.
+	 * @param tries Max number of tries before rejecting.
+	 * @returns 
+	*/
+	public async try(tries: number): Promise&lt;T&gt;{
+		const retry = async(i: number, target: T, ...parameters: Parameters&lt;T&gt;): Promise&lt;T&gt; =&gt; {
+			try {
+				const data = await target(...[...parameters]);
+				return data;
+			}
+			catch (e) {
+				this._event.emit("failure", e, i, this._options.interval);
+				if (i &lt;= 1) return Promise.reject(e);
+				this._event.emit("retry", i, this._options.interval);
+				if(this._options.interval &gt; 0){
+					await new Promise(resolve =&gt; setTimeout(resolve, this._options.interval));
+					this._updateInterval();
+					return retry(i - 1, target, ...parameters);
+				}
+				else return retry(i - 1, target, ...parameters);
+			}
+		};
 &nbsp;
-        try{
-            const result = await retry(tries, this._target, ...this._parameters);
-            return result;
-        }
-        catch(e){
-            return Promise.reject(e);
-        }
-    }
+		try{
+			const result = await retry(tries, this._target, ...this._parameters);
+			return result;
+		}
+		catch(e){
+			return Promise.reject(e);
+		}
+	}
 &nbsp;
-    private _updateInterval(): number{
-        this._options.interval = this._options.exponential ? this._options.interval * this._options.factor : this._options.interval;
-        return this._options.interval;
-    }
-    
-    public on(event: string, cb: (...args: any) =&gt; void): this {
-        this._event.on(event, cb);
-        return this;
-    }
+	private _updateInterval(): number{
+		this._options.interval = this._options.exponential ? this._options.interval * this._options.factor : this._options.interval;
+		return this._options.interval;
+	}
+	
+	public on(event: string, cb: (...args: any) =&gt; void): this {
+		this._event.on(event, cb);
+		return this;
+	}
 &nbsp;
-    public once(event: string, cb: (...args: any) =&gt; void): this {
-        this._event.once(event, cb);
-        return this;
-    }
+	public once(event: string, cb: (...args: any) =&gt; void): this {
+		this._event.once(event, cb);
+		return this;
+	}
 }
 &nbsp;
 /**
@@ -397,14 +397,14 @@ export class Retry&lt;T extends (...args: any) =&gt; Promise&lt;any&gt;&gt; {
 */
 export default async function <span class="fstat-no" title="function not covered" >retry&lt;</span>T extends (...args: any) =&gt; Promise&lt;any&gt;&gt;
 (tries: number, target: T, parameters: Parameters&lt;T&gt;, options: Partial&lt;RetryOptions&gt;){
-<span class="cstat-no" title="statement not covered" >    try{</span>
-        const r = <span class="cstat-no" title="statement not covered" >new Retry(target, parameters, options);</span>
-        const result = <span class="cstat-no" title="statement not covered" >await r.try(tries)</span>
-<span class="cstat-no" title="statement not covered" >        return Promise.resolve(result);</span>
-    }
-    catch(e: any){
-<span class="cstat-no" title="statement not covered" >        return Promise.reject(e);</span>
-    }
+<span class="cstat-no" title="statement not covered" >	try{</span>
+		const r = <span class="cstat-no" title="statement not covered" >new Retry(target, parameters, options);</span>
+		const result = <span class="cstat-no" title="statement not covered" >await r.try(tries);</span>
+<span class="cstat-no" title="statement not covered" >		return Promise.resolve(result);</span>
+	}
+	catch(e: any){
+<span class="cstat-no" title="statement not covered" >		return Promise.reject(e);</span>
+	}
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -412,7 +412,7 @@ export default async function <span class="fstat-no" title="function not covered
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-01-16T15:11:52.903Z
+                at 2023-01-16T15:21:47.252Z
             </div>
         <script src="prettify.js"></script>
         <script>

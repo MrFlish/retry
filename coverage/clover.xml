@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1673881912909" clover="3.2.0">
-  <project timestamp="1673881912910" name="All files">
+<coverage generated="1673882507258" clover="3.2.0">
+  <project timestamp="1673882507258" name="All files">
     <metrics statements="35" coveredstatements="30" conditionals="6" coveredconditionals="6" methods="9" coveredmethods="8" elements="50" coveredelements="44" complexity="0" loc="35" ncloc="35" packages="1" files="1" classes="1"/>
     <file name="index.ts" path="/home/bertrand/Development/Recup.linux/retry/src/classes/retry/promises/index.ts">
       <metrics statements="35" coveredstatements="30" conditionals="6" coveredconditionals="6" methods="9" coveredmethods="8"/>
