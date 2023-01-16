@@ -2,14 +2,14 @@ import { EventEmitter } from "events";
 
 interface RetryOptions {
 	interval: number,
-	exponential: boolean,
-	factor: number
+	BinaryExponential: boolean,
+	// factor: number
 }
 
 const DEFAULT_OPTIONS: RetryOptions = {
 	interval: 0,
-	exponential: false,
-	factor: 2
+	BinaryExponential: false,
+	// factor: 2
 };
 
 
@@ -59,7 +59,7 @@ export class Retry< T extends (...args: Parameters<T>) => Promise<Awaited<Return
 	}
 
 	private _updateInterval(): number{
-		this._options.interval = this._options.exponential ? this._options.interval * this._options.factor : this._options.interval;
+		this._options.interval = this._options.BinaryExponential ? this._options.interval * /* this._options.factor */ 2 : this._options.interval;
 		return this._options.interval;
 	}
 	
