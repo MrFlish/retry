@@ -1,4 +1,4 @@
-import { Retry } from "../promises";
+import { Retry } from "../retry";
 
 
 const tolerance = function(n: number, target: number, tolerance = 0.05): boolean{
@@ -25,7 +25,7 @@ describe("Classe Retry()", () => {
 			try{
 				const execute = new Retry(failure, []);
 				await execute.try(5);
-				throw "This test should fail.";
+				throw "This test should have fail.";
 			}
 			catch(e){
 				expect(failure.mock.calls.length).toBe(5);
@@ -118,7 +118,7 @@ describe("Classe Retry()", () => {
 			
 			const INTERVAL = 100;
 			const EXPO = 2;
-			const execute = new Retry(uncertain, [], { interval: INTERVAL, exponential: true, factor: EXPO });
+			const execute = new Retry(uncertain, [], { interval: INTERVAL, BinaryExponential: true });
 			const ends: number[] = [];
 			const chronos: number[] = [];
 			const expected: number[] = [INTERVAL];
