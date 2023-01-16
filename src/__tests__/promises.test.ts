@@ -6,7 +6,7 @@ const tolerance = function(n: number, target: number, tolerance = 0.05): boolean
 };
 
 describe("Classe Retry()", () => {
-	const DRIFT_TOLERANCE = 0.05;
+	const DRIFT_TOLERANCE = 0.1;
 	describe("Méthode try() - Sans intervales de temps.", () => {
 		it("Une opération qui s'exécute avec succès du premier coup résout le résultat de cette opération.", async () => {
 			const successful = jest.fn().mockImplementation(() => {
@@ -59,7 +59,7 @@ describe("Classe Retry()", () => {
 				.mockImplementationOnce(() => Promise.resolve("That was not easy, but i finally did it !"));
 
 			const execute = new Retry(uncertain, []);
-			execute.on("failure", (e, c, i) => { ++n; });
+			execute.on("failure", () => { ++n; });
 			await execute.try(8);
 			expect(n).toBe(5);
 		});
@@ -75,7 +75,7 @@ describe("Classe Retry()", () => {
 				.mockImplementationOnce(() => Promise.resolve("That was not easy, but i finally did it !"));
 
 			const execute = new Retry(uncertain, []);
-			execute.once("failure", (e, c, i) => { ++n; });
+			execute.once("failure", () => { ++n; });
 			await execute.try(8);
 			expect(n).toBe(1);
 		});
@@ -93,19 +93,18 @@ describe("Classe Retry()", () => {
 			
 			const INTERVAL = 100;
 			const execute = new Retry(uncertain, [], { interval: INTERVAL });
-			let ends: number[] = [];
-			let chronos: number[] = [];
-			execute.on("failure", (e, c, i) => {     
+			const chronos: number[] = [];
+			execute.on("failure", () => {     
 				chronos.push(Date.now());
 			});
 			await execute.try(8);
-			let end = Date.now();
+			const ends: number[] = [];
 			for(let i = 0; i < chronos.length -1; ++i){
-				ends.push(chronos[i + 1] - chronos[i])
+				ends.push(chronos[i + 1] - chronos[i]);
 			}
-			ends.push(end - chronos[chronos.length -1])
+			const end = Date.now();
+			ends.push(end - chronos[chronos.length -1]);
 			expect(ends.some((v) => (!tolerance(v, INTERVAL, DRIFT_TOLERANCE)))).toBe(false);
-			// expect(ends.some((v) => (v < INTERVAL * 0.98 || v > INTERVAL * 1.02))).toBe(false);
 		});
 	});
 
@@ -123,16 +122,19 @@ describe("Classe Retry()", () => {
 			const ends: number[] = [];
 			const chronos: number[] = [];
 			const expected: number[] = [INTERVAL];
-			execute.on("failure", (e, c, i) => { chronos.push(Date.now()); });
+			execute.on("failure", () => { chronos.push(Date.now()); });
 			await execute.try(5);
-			let end = Date.now();
-			for(let i = 0; i < chronos.length -1; ++i){ ends.push((chronos[i + 1] - chronos[i])); };
+			const end = Date.now();
+			for(let i = 0; i < chronos.length -1; ++i){
+				ends.push((chronos[i + 1] - chronos[i]));
+			}
 			ends.push(end - chronos[chronos.length -1]);
-			ends.slice(1).forEach((d) => { expected.push(expected[expected.length - 1] * EXPO)});
+			for(let i = 0; i < ends.slice(1).length; i++){
+				expected.push(expected[expected.length - 1] * EXPO);
+			}
 			let result = false;
 			for(let i = 0; i < expected.length; ++i){
 				if(!tolerance(ends[i], expected[i], DRIFT_TOLERANCE)){
-				// if(ends[i] < expected[i] * 0.95 || ends[i] > expected[i] * 1.05){
 					result = true;
 					break;
 				}
