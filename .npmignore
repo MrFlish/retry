@@ -1,0 +1,5 @@
+tsconfig.json
+.eslintrc
+jest.config.js
+/src/
+/coverage/
