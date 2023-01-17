@@ -8,7 +8,7 @@ The `retry` function allows you to quickly retry a promise if it fails.
 Import it into your project as follows
 
 ```js
-import retry from "retry";
+import retry from "@mrflish/retry";
 ```
 
 the `retry` function takes several parameters
@@ -21,7 +21,7 @@ const result = await retry(num_of_tries, func_name, [func_param1, func_param2, .
 `retry` will fail and throw if the function does not resolve before the maximum number of tries reaches its limit.
 
 ```js
-import retry from "retry";
+import retry from "@mrflish/retry";
 
 let count = 1;
 const notSureIllResolve = async (param1: string, param2: number, param3: boolean[]) => {
@@ -48,7 +48,7 @@ try {
 `retry` will resolve if the function resolves before the maximum number of tries reaches its limit
 
 ```js
-import retry from "retry";
+import retry from "@mrflish/retry";
 
 let count = 1;
 const notSureIllResolve = async (param1: string, param2: number, param3: boolean[]) => {
@@ -77,14 +77,14 @@ The `Retry` class allows you to have more information about the execution of the
 Import it into your project as follows
 
 ```js
-import { Retry } from "retry";
+import { Retry } from "@mrflish/retry";
 ```
 
 the `Retry` construcor takes several parameters
 the first one is the function to try to run
 
 ```js
-import { Retry } from "./retry";
+import { Retry } from "@mrflish/retry";
 const execute = new Retry(func_name, [func_param1, func_param2, ...], options);
 try {
 	//the number of tries is not high enough to allow the function to resolve.
