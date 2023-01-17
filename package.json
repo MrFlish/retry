@@ -1,8 +1,9 @@
 {
   "name": "@mrflish/retry",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "promise based retry pattern with typescript guards",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "rm -rf ./dist/ && tsc"
