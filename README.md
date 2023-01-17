@@ -1,6 +1,6 @@
 # Retry
 
-## A promise based retry pattern with typescript guards
+## A typesafe promise based retry pattern
 
 
 ### `retry` function
