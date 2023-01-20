@@ -1,6 +1,6 @@
 # Retry
 
-## A typesafe promise based retry pattern
+## A typesafe promise based retry pattern.
 
 
 ### `retry` function
